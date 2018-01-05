@@ -1,5 +1,7 @@
+/build
 /html
 /.idea
 /node_modules
 /temp
 /lib/*
+/coverage

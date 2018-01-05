@@ -1,13 +1,15 @@
-const style = `
+const config = {
+  style: `
 <style>
 article {
     margin: 0 auto;
     max-width: 750px;
 }
 </style>
-`;
+`,
+};
 
-const htmlBefore = (title, style) => `
+const htmlBefore = (title, style = config.style) => `
 <html>
 <head>
 <title>${title}</title>
@@ -24,7 +26,7 @@ const htmlAfter = `
 `;
 
 module.exports = {
-    style
-    , htmlBefore
-    , htmlAfter
+  style: config.style,
+  htmlBefore,
+  htmlAfter,
 };
