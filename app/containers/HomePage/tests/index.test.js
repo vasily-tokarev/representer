@@ -1,17 +1,28 @@
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
 import { shallow } from 'enzyme';
 
+import PostingsList from 'components/PostingsList';
 import HomePage from '../index';
-import messages from '../messages';
 
 describe('<HomePage />', () => {
-  it('should render the page message', () => {
+  it('should render the postings list', () => {
+    const postings = [
+      {
+        id: 1,
+        href: '/posting-1.html',
+        text: 'Posting One text.',
+        title: 'Posting One',
+      },
+      {
+        id: 2,
+        href: '/posting-2.html',
+        text: 'Posting Two text.',
+        title: 'Posting Two',
+      },
+    ];
     const renderedComponent = shallow(
-      <HomePage />
+      <HomePage />,
     );
-    expect(renderedComponent.contains(
-      <FormattedMessage {...messages.header} />
-    )).toEqual(true);
+    expect(renderedComponent.contains(<PostingsList postings={postings} />)).toEqual(true);
   });
 });
