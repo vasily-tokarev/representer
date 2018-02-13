@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getPosts Saga should dispatch the postsLoaded action 1`] = `
+Object {
+  "@@redux-saga/IO": true,
+  "CALL": Object {
+    "args": Array [
+      "api/posts",
+    ],
+    "context": null,
+    "fn": [Function],
+  },
+}
+`;

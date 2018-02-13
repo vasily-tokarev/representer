@@ -1,36 +1,65 @@
-/*
+/**
+ *
  * HomePage
  *
- * This is the first thing users see of our App, at the '/' route
- *
- * NOTE: while this component should technically be a stateless functional
- * component (SFC), hot reloading does not currently support SFCs. If hot
- * reloading is not a necessity for you then you can refactor it and remove
- * the linting exception.
  */
 
+import injectSaga from 'utils/injectSaga';
+import injectReducer from 'utils/injectReducer';
 import React from 'react';
-import PostingsList from 'components/PostingsList';
+import { Redirect } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
+import { compose } from 'redux';
+import PostsList from 'components/PostsList';
 
-const postings = [
-  {
-    id: 1,
-    href: '/posting-1.html',
-    text: 'Posting One text.',
-    title: 'Posting One',
-  },
-  {
-    id: 2,
-    href: '/posting-2.html',
-    text: 'Posting Two text.',
-    title: 'Posting Two',
-  },
-];
+import { loadPosts } from './actions';
+import makeSelectHomePage from './selectors';
+import reducer from './reducer';
+import saga from './saga';
 
-export default class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+  componentDidMount() {
+    this.props.onLoad();
+  }
+
   render() {
+    const match = window.location.search.match(/(?:post)=([^&]*)/);
+    const posts = this.props.posts.data;
     return (
-      <PostingsList postings={postings} />
+      <div>
+        {match ? <Redirect to={`posts/${match[1]}`}/> : ''}
+        {posts && posts.length > 0 ? <PostsList posts={posts}/> : ''}
+      </div>
     );
   }
 }
+
+HomePage.propTypes = {
+  posts: PropTypes.object,
+  onLoad: PropTypes.func,
+};
+
+const mapStateToProps = createStructuredSelector({
+  posts: makeSelectHomePage(),
+});
+
+function mapDispatchToProps(dispatch) {
+  return {
+    onLoad: () => {
+      dispatch(loadPosts());
+    },
+  };
+}
+
+const withConnect = connect(mapStateToProps, mapDispatchToProps);
+
+const withReducer = injectReducer({ key: 'homePage', reducer });
+const withSaga = injectSaga({ key: 'homePage', saga });
+
+export default compose(
+  withReducer,
+  withSaga,
+  withConnect,
+)(HomePage);
