@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getPost Saga should dispatch the getPost action 1`] = `
+Object {
+  "@@redux-saga/IO": true,
+  "SELECT": Object {
+    "args": Array [],
+    "selector": [Function],
+  },
+}
+`;
+
+exports[`getPost Saga should dispatch the getPost action 2`] = `
+Object {
+  "@@redux-saga/IO": true,
+  "CALL": Object {
+    "args": Array [
+      "/api/output/[object Object]/[object Object]",
+    ],
+    "context": null,
+    "fn": [Function],
+  },
+}
+`;
