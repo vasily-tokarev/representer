@@ -14,21 +14,27 @@ const readdir = promisify(fs.readdir);
 const readFile = promisify(fs.readFile);
 const rmrf = promisify(rimraf);
 
-// TODO: JSDoc.
-// TODO: Tests.
-
 const withoutExtension = (str) => str.replace(/\..*/, '');
 
 const title = (text) => text.split('\n')[0].replace(/#\s/, '');
 
-const posts = (names, texts) => names.map((name, index) => {
+const postsJSON = (names, texts) => names.map((name, index) => {
   const text = texts[index];
   return {
+    id: index, // React key
     name,
     text,
     title: title(text),
   };
 });
+
+const postWithoutText = (post) => (
+  {
+    id: post.id,
+    name: post.name,
+    title: post.title,
+  }
+);
 
 const errHandler = (err) => {
   // eslint-disable-next-line no-console
@@ -43,16 +49,19 @@ class Converter {
   }
 
   convert() {
-    return co(() => this.main()).catch(errHandler);
+    co(() => this.main()).catch(errHandler);
   }
 
   * main() {
     const names = yield this.names(this.input);
     const texts = yield this.texts(names);
     const namesWithoutExtension = names.map(withoutExtension);
+    const posts = postsJSON(namesWithoutExtension, texts);
+
     yield this.clean();
     yield this.writeDirs(namesWithoutExtension);
-    yield this.writePosts(posts(namesWithoutExtension, texts));
+    yield this.writePosts(posts);
+    yield this.writeIndexFile(posts);
   }
 
   * names(dir) {
@@ -76,6 +85,13 @@ class Converter {
 
   * writePosts(files) {
     yield Promise.resolve(yield files.map(this.writePost.bind(this)));
+  }
+
+  * writeIndexFile(posts) {
+    yield Promise.resolve(yield appendFile(
+      `${this.output}/index.json`,
+      JSON.stringify(posts.map(postWithoutText)))
+    );
   }
 
   * writeDir(dir) {

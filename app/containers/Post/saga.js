@@ -4,13 +4,11 @@ import { postLoaded } from 'containers/Post/actions';
 import request from 'utils/request';
 import { LOAD_POST } from './constants';
 
-// import { makeSelectPost, makeSelectPostName } from './selectors';
 import { makeSelectPostName } from './selectors';
 
 export function* getPost() {
-  // Select username from store
   const name = yield select(makeSelectPostName());
-  const requestURL = `/api/output/${name}/${name}`;
+  const requestURL = `/api/posts/${name}`;
   try {
     const post = yield call(request, requestURL);
     yield put(postLoaded(post));

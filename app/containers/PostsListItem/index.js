@@ -13,7 +13,7 @@ export class PostsListItem extends React.PureComponent { // eslint-disable-line 
   render() {
     const item = this.props.item;
     const content = (
-      <Link to={item.name}>
+      <Link to={`/posts/${item.name}`}>
         {item.name}
       </Link>
     );
