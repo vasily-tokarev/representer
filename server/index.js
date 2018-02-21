@@ -14,8 +14,8 @@ const app = express();
 const api = require('./api');
 
 // If you need a backend, e.g. an API, add your custom backend-specific middleware here
-app.use('/api/', api.posts);
-app.use('/api/', api.index);
+app.use('/posts/', api.posts);
+app.use('/', api.index);
 
 // In production we need to pass these values in instead of relying on webpack
 setup(app, {

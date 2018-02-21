@@ -10,7 +10,7 @@
     "npm": ">=3",
     "node": ">=5"
   },
-  "author": "Max Stoiber",
+  "author": "Vasily Tokarev",
   "license": "MIT",
   "scripts": {
     "analyze:clean": "rimraf stats.json",
@@ -21,7 +21,9 @@
     "preinstall": "npm run npmcheckversion",
     "postinstall": "npm run build:dll",
     "prebuild": "npm run build:clean",
-    "build": "cross-env NODE_ENV=production webpack --config internals/webpack/webpack.prod.babel.js --color -p --progress --hide-modules --display-optimization-bailout",
+    "postbuild": "cross-env NODE_ENV=production node ./src/postbuild.js",
+    "build": "cross-env NODE_ENV=production webpack --config internals/webpack/webpack.prod.babel.js --color -p --progress --hide-modules --display-optimization-bailout; npm run build:convert",
+    "build:convert": "cross-env NODE_ENV=production node ./src/converter.js",
     "build:clean": "rimraf ./build",
     "build:dll": "node ./internals/scripts/dependencies.js",
     "start": "cross-env NODE_ENV=development node node_modules/nodemon/bin/nodemon.js server",
