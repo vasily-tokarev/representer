@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import { mapDispatchToProps, Post } from '../index';
+import { mapDispatchToProps, PostContainer } from '../index';
 
 describe('<Post />', () => {
   const match = {
@@ -13,9 +13,9 @@ describe('<Post />', () => {
   it('should render the posts list', () => {
     const onLoad = jest.fn();
     const renderedComponent = shallow(
-      <Post onLoad={onLoad} match={match} post={{}} />
+      <PostContainer onLoad={onLoad} match={match} post={{}} />
     );
-    expect(renderedComponent.find(<Post />));
+    expect(renderedComponent.find(<PostContainer />));
   });
 });
 

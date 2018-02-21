@@ -7,12 +7,19 @@
 import {
   LOAD_POST_SUCCESS,
   LOAD_POST,
+  UNMOUNT_POST,
 } from './constants';
 
 export function loadPost(name) {
   return {
     type: LOAD_POST,
     name,
+  };
+}
+
+export function unmountPost() {
+  return {
+    type: UNMOUNT_POST,
   };
 }
 

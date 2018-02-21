@@ -44,7 +44,7 @@ const nextText = (text, fstJSX, sndJSX) =>
     : text.length > 0 ? { type: 'text', match: text }
       : false;
 
-const nextJSX = (text, jsx) => text.substring(0, jsx.index).length === 0 ? jsx : false;
+const nextJSX = (text, jsx) => jsx && text.substring(0, jsx.index).length === 0 ? jsx : false;
 
 const remainingText = (text, next) => {
   switch (next.type) {
@@ -58,6 +58,7 @@ const remainingText = (text, next) => {
 };
 
 const toNodeList = (text) => (rendered) => {
+  // console.log(text);
   if (text.length === 0) return rendered;
 
   const sortedJSXs = jsxs(text)

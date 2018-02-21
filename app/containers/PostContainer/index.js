@@ -7,13 +7,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Helmet } from 'react-helmet';
 import { createStructuredSelector } from 'reselect';
 import { compose } from 'redux';
 
+import Post from 'components/Post';
+
 import injectSaga from 'utils/injectSaga';
 import injectReducer from 'utils/injectReducer';
-import { loadPost } from './actions';
+import { loadPost, unmountPost } from './actions';
 import makeSelectPost from './selectors';
 import reducer from './reducer';
 import saga from './saga';
@@ -21,30 +22,29 @@ import toNodeList from './toNodeList';
 
 const html = (el) => el.type === 'text' ? el.match : el.jsx(el.match);
 
-export class Post extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
+export class PostContainer extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentWillMount() {
     this.props.onLoad(this.props.match.params.name);
   }
 
+  componentWillUnmount() {
+    this.props.onUnmount();
+  }
+
   render() {
-    const text = this.props.post.data ? this.props.post.data.text : '';
-    const name = this.props.post.data ? this.props.post.data.name : '';
-    const converted = text.length > 0 ? toNodeList(text)([]) : false;
-    return (
-      <div>
-        <Helmet>
-          <title>Post {name}</title>
-          <meta name="description" content="Description of Post"/>
-        </Helmet>
-        {this.props.post.data ? this.props.post.data.title : ''}
-        <div>{converted ? converted.map(html) : ''}</div>
-      </div>
-    );
+    return this.props.post.data && this.props.post.data.text.length > 0
+      ? (<Post
+        title={this.props.post.data.title}
+        name={this.props.post.data.name}
+        text={toNodeList(this.props.post.data.text)([]).map(html)}
+      />)
+      : null;
   }
 }
 
-Post.propTypes = {
+PostContainer.propTypes = {
   match: PropTypes.object,
+  onUnmount: PropTypes.func,
   onLoad: PropTypes.func,
   post: PropTypes.object,
   name: PropTypes.string,
@@ -59,6 +59,9 @@ export function mapDispatchToProps(dispatch) {
     onLoad: (name) => {
       dispatch(loadPost(name));
     },
+    onUnmount: () => {
+      dispatch(unmountPost());
+    },
   };
 }
 
@@ -71,4 +74,4 @@ export default compose(
   withReducer,
   withSaga,
   withConnect,
-)(Post);
+)(PostContainer);

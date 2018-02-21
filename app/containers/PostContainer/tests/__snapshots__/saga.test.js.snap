@@ -15,7 +15,7 @@ Object {
   "@@redux-saga/IO": true,
   "CALL": Object {
     "args": Array [
-      "/api/output/[object Object]/[object Object]",
+      "/posts/name/[object Object].json",
     ],
     "context": null,
     "fn": [Function],

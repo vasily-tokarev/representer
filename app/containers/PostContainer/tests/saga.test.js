@@ -3,9 +3,9 @@
  */
 
 /* eslint-disable redux-saga/yield-effects */
-import { LOAD_POST } from 'containers/Post/constants';
+import { LOAD_POST } from 'containers/PostContainer/constants';
 import { put, takeLatest } from 'redux-saga/effects';
-import { postLoaded } from 'containers/Post/actions';
+import { postLoaded } from 'containers/PostContainer/actions';
 import postData, { getPost } from '../saga';
 
 const post = {
