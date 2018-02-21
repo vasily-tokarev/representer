@@ -18,6 +18,7 @@ import { loadPosts } from './actions';
 import makeSelectHomePage from './selectors';
 import reducer from './reducer';
 import saga from './saga';
+const config = require('../../../config');
 
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentDidMount() {
@@ -29,7 +30,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
     const posts = this.props.posts.data;
     return (
       <div>
-        {match ? <Redirect to={`posts/${match[1]}`}/> : ''}
+        {match ? <Redirect to={`/${config.mountPoint}/posts/${match[1]}`}/> : ''}
         {posts && posts.length > 0 ? <PostsList posts={posts}/> : ''}
       </div>
     );

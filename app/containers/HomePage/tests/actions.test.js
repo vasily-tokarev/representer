@@ -11,7 +11,6 @@ describe('HomePage actions', () => {
       const fixture = 'post';
       const expected = {
         type: LOAD_POSTS,
-        posts: fixture,
       };
       expect(loadPosts(fixture)).toEqual(expected);
     });

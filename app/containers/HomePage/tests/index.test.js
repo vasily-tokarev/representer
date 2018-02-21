@@ -19,7 +19,6 @@ describe('<HomePage />', () => {
       <HomePage posts={posts}/>,
     );
     expect(renderedComponent.contains(<PostsList posts={[posts.data[0]]} />)).toEqual(true);
-    // expect(renderedComponent.find(<PostsList posts={posts} />)).toBeDefined();
   });
 
   it('render redirect if match is present', () => {
@@ -32,7 +31,7 @@ describe('<HomePage />', () => {
     const renderedComponent = shallow(
       <HomePage posts={posts}/>,
     );
-    expect(renderedComponent.contains(<Redirect to={'posts/first-post'}/>)).toEqual(true);
+    expect(renderedComponent.contains(<Redirect to={'/representer/posts/first-post'}/>)).toEqual(true);
   });
 });
 

@@ -14,10 +14,13 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Switch, Route } from 'react-router-dom';
+import path from 'path';
 
 import HomePage from 'containers/HomePage/Loadable';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
-import Post from 'containers/Post/Loadable';
+import PostContainer from 'containers/PostContainer/Loadable';
+
+const config = require('../../../config');
 
 const AppWrapper = styled.div`
   max-width: calc(768px + 16px * 2);
@@ -32,10 +35,11 @@ export default function App() {
   return (
     <AppWrapper>
       <Switch>
-        <Route exact path="/" component={HomePage}/>
-        <Route path="/posts/:name" component={Post}/>
+        <Route exact path={path.join('/', config.mountPoint)} component={HomePage}/>
+        <Route path={path.join('/', config.mountPoint, 'posts', ':name')} component={PostContainer} />
         <Route component={NotFoundPage}/>
       </Switch>
     </AppWrapper>
   );
 }
+

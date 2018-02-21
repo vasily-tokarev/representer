@@ -5,7 +5,6 @@ import Ul from './Ul';
 import Wrapper from './Wrapper';
 
 function List(props) {
-  // console.log(props);
   const ComponentToRender = props.component;
   let content = (<div></div>);
 

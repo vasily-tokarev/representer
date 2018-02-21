@@ -5,7 +5,7 @@ import { postsLoaded } from './actions';
 import { LOAD_POSTS } from './constants';
 
 export function* getPosts() {
-  const requestURL = '/api/index';
+  const requestURL = './index.json';
   try {
     const posts = yield call(request, requestURL);
     yield put(postsLoaded(posts));
