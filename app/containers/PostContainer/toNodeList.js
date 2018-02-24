@@ -23,8 +23,8 @@ const newline = () => <br key={id()}/>;
 const id = shortid.generate;
 
 const matchers = [
-  [italic, /_(.*)_/],
-  [bold, /\*\*(.*)\*\*/],
+  [italic, /_(.*?)_/],
+  [bold, /\*\*(.*?)\*\*/],
   [url, /\[(.*)]\((.*)\)/],
   [h1, /#(.*)\n/],
   [newline, /\n/],
