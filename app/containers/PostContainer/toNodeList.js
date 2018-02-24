@@ -58,7 +58,6 @@ const remainingText = (text, next) => {
 };
 
 const toNodeList = (text) => (rendered) => {
-  // console.log(text);
   if (text.length === 0) return rendered;
 
   const sortedJSXs = jsxs(text)

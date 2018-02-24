@@ -14,7 +14,7 @@ import Post from 'components/Post';
 
 import injectSaga from 'utils/injectSaga';
 import injectReducer from 'utils/injectReducer';
-import { loadPost, unmountPost } from './actions';
+import { loadPost, unmountPost, WSPayload } from './actions';
 import makeSelectPost from './selectors';
 import reducer from './reducer';
 import saga from './saga';
@@ -25,6 +25,12 @@ const html = (el) => el.type === 'text' ? el.match : el.jsx(el.match);
 export class PostContainer extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentWillMount() {
     this.props.onLoad(this.props.match.params.name);
+  }
+
+  componentDidMount() {
+    new WebSocket('ws://localhost:8080').onmessage = (evt) => {
+      this.props.onWSPayload(evt.data);
+    };
   }
 
   componentWillUnmount() {
@@ -46,6 +52,7 @@ PostContainer.propTypes = {
   match: PropTypes.object,
   onUnmount: PropTypes.func,
   onLoad: PropTypes.func,
+  onWSPayload: PropTypes.func,
   post: PropTypes.object,
   name: PropTypes.string,
 };
@@ -61,6 +68,9 @@ export function mapDispatchToProps(dispatch) {
     },
     onUnmount: () => {
       dispatch(unmountPost());
+    },
+    onWSPayload: (data) => {
+      dispatch(WSPayload(data));
     },
   };
 }

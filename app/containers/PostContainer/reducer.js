@@ -8,7 +8,7 @@ import { fromJS } from 'immutable';
 import {
   LOAD_POST,
   LOAD_POST_SUCCESS,
-  UNMOUNT_POST,
+  UNMOUNT_POST, WS_PAYLOAD,
 } from './constants';
 
 const initialState = fromJS({});
@@ -24,6 +24,9 @@ function postReducer(state = initialState, action) {
     case UNMOUNT_POST:
       return state
         .set('data', { id: 0, text: '', name: '', title: 'Loading' });
+    case WS_PAYLOAD:
+      return state
+        .set('data', { id: 0, text: action.data, name: '', title: '' });
     default:
       return state;
   }

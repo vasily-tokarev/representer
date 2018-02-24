@@ -13,6 +13,28 @@ const app = express();
 
 const api = require('./api');
 
+const WebSocket = require('ws');
+
+const wss = new WebSocket.Server({ port: 8080 });
+
+wss.on('connection', (ws) => {
+  ws.on('message', (message) => {
+    // console.log('received: %s', message);
+    wss.clients.forEach((client) => {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(message);
+      }
+    });
+  });
+
+  ws.on('error', (err) => {
+    if (err.code !== 'ECONNRESET') {
+      console.log('Unexpected error:', err); // eslint-disable-line no-console
+    }
+  });
+});
+
+
 // If you need a backend, e.g. an API, add your custom backend-specific middleware here
 app.use('/posts/', api.posts);
 app.use('/', api.index);
