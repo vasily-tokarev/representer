@@ -31,9 +31,10 @@ export function postLoaded(post) {
   };
 }
 
-export function WSPayload(data) {
+export function WSPayload(data, name) {
   return {
     type: WS_PAYLOAD,
     data,
+    name,
   };
 }

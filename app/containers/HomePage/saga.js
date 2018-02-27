@@ -10,6 +10,7 @@ export function* getPosts() {
     const posts = yield call(request, requestURL);
     yield put(postsLoaded(posts));
   } catch (err) {
+    console.log('Error fetching index.json:', err); // eslint-disable-line no-console
     // yield put(repoLoadingError(err));
   }
 }

@@ -20,6 +20,8 @@ import reducer from './reducer';
 import saga from './saga';
 import toNodeList from './toNodeList';
 
+const config = require('../../../config');
+
 const html = (el) => el.type === 'text' ? el.match : el.jsx(el.match);
 
 export class PostContainer extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
@@ -28,9 +30,11 @@ export class PostContainer extends React.PureComponent { // eslint-disable-line 
   }
 
   componentDidMount() {
-    new WebSocket('ws://localhost:8080').onmessage = (evt) => {
-      this.props.onWSPayload(evt.data);
-    };
+    if (!config.env === 'prod') {
+      new WebSocket('ws://localhost:8080').onmessage = (evt) => {
+        this.props.onWSPayload(this.props.post.name, evt.data);
+      };
+    }
   }
 
   componentWillUnmount() {
@@ -42,7 +46,7 @@ export class PostContainer extends React.PureComponent { // eslint-disable-line 
       ? (<Post
         title={this.props.post.data.title}
         name={this.props.post.data.name}
-        text={toNodeList(this.props.post.data.text)([]).map(html)}
+        text={toNodeList(this.props.post.data.name)(this.props.post.data.text)([]).map(html)}
       />)
       : null;
   }
@@ -69,8 +73,8 @@ export function mapDispatchToProps(dispatch) {
     onUnmount: () => {
       dispatch(unmountPost());
     },
-    onWSPayload: (data) => {
-      dispatch(WSPayload(data));
+    onWSPayload: (postName, data) => {
+      dispatch(WSPayload(data, postName));
     },
   };
 }

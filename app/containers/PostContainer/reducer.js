@@ -26,7 +26,7 @@ function postReducer(state = initialState, action) {
         .set('data', { id: 0, text: '', name: '', title: 'Loading' });
     case WS_PAYLOAD:
       return state
-        .set('data', { id: 0, text: action.data, name: '', title: '' });
+        .set('data', { id: 0, text: action.data, name: action.name, title: '' });
     default:
       return state;
   }

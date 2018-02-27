@@ -15,6 +15,7 @@ export function* getPost() {
     const post = yield call(request, requestURL);
     yield put(postLoaded(post));
   } catch (err) {
+    console.log('Error fetching the post:', err); // eslint-disable-line no-console
     // yield put(repoLoadingError(err));
   }
 }

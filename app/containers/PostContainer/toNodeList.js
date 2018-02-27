@@ -1,6 +1,8 @@
 import React from 'react';
 import shortid from 'shortid';
 
+const config = require('../../../config');
+
 // TODO: Implement `re.exec` version.
 // https://stackoverflow.com/questions/6323417/how-do-i-retrieve-all-matches-for-a-regular-expression-in-javascript
 
@@ -19,24 +21,20 @@ const bold = (m) => <strong key={id()}>{m[1]}</strong>;
 const italic = (m) => <i key={id()}>{m[1]}</i>;
 const h1 = (m) => <strong key={id()}>{m[1]}<br/></strong>;
 const newline = () => <br key={id()}/>;
+const image = (postName) => (m) => (
+  <img
+    alt={m[1]}
+    src={`${config.env === 'prod' ? `/${config.mountPoint}` : ''}/posts/${postName}/images/${m[2]}`}
+    key={id()}
+  />
+);
 
 const id = shortid.generate;
-
-const matchers = [
-  [italic, /_(.*?)_/],
-  [bold, /\*\*(.*?)\*\*/],
-  [url, /\[(.*)]\((.*)\)/],
-  [h1, /#(.*)\n/],
-  [newline, /\n/],
-];
-
+const I = (identity) => identity;
 const match = (text, m) => text.match(m[1]);
 const matched = (text) => (m) => match(text, m) ? element(match(text, m), m[0]) : false;
-
-const I = (identity) => identity;
 const byIndexAsc = (a, b) => a.index - b.index;
-
-const jsxs = (text) => matchers.map(matched(text));
+const jsxs = (text, matchers) => matchers.map(matched(text));
 
 const nextText = (text, fstJSX, sndJSX) =>
   fstJSX ? { type: 'text', match: text.substring(0, fstJSX.index) }
@@ -57,10 +55,19 @@ const remainingText = (text, next) => {
   }
 };
 
-const toNodeList = (text) => (rendered) => {
+const toNodeList = (postName) => (text) => (rendered) => {
   if (text.length === 0) return rendered;
 
-  const sortedJSXs = jsxs(text)
+  const matchers = [
+    [italic, /_(.*?)_/],
+    [bold, /\*\*(.*?)\*\*/],
+    [url, /\[(.*)]\((.*)\)/],
+    [h1, /#(.*)\n/],
+    [newline, /\n/],
+    [image(postName), /(?:!\[(.*?)\]\((.*?)\))/],
+  ];
+
+  const sortedJSXs = jsxs(text, matchers)
     .filter(I)
     .sort(byIndexAsc);
 
@@ -68,7 +75,7 @@ const toNodeList = (text) => (rendered) => {
   const sndJSX = sortedJSXs[1];
 
   const next = nextJSX(text, fstJSX) || nextText(text, fstJSX, sndJSX);
-  const convertWithRemaining = toNodeList(remainingText(text, next));
+  const convertWithRemaining = toNodeList(postName)(remainingText(text, next));
 
   return next.type === 'jsx' ?
     convertWithRemaining(rendered.concat(nextJSX(text, next)))

@@ -37,6 +37,7 @@ wss.on('connection', (ws) => {
 
 // If you need a backend, e.g. an API, add your custom backend-specific middleware here
 app.use('/posts/', api.posts);
+app.use('/posts/', api.images);
 app.use('/', api.index);
 
 // In production we need to pass these values in instead of relying on webpack
