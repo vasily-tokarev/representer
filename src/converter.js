@@ -1,19 +1,20 @@
 /*
-- Creates `index.json` file containing all posts from input directory with id, name and title.
 - Creates `post-name` directory for each post with:
  - HTML containing instant redirect to the app.
  - JSON file containing the whole post including the text.
+ - Images from the source directory.
+- Creates `index.json` file containing all posts from input directory with id, name and title.
 */
 
-// Node imports.
+// Node.
 const fs = require('fs');
 const p = require('path');
 const promisify = require('util').promisify;
 
-// Unsorted imports.
-const co = require('co');
+// Unsorted.
 const rimraf = require('rimraf');
 const config = require('../config');
+const shortid = require('shortid');
 
 // Promisify.
 const appendFile = promisify(fs.appendFile);
@@ -23,42 +24,39 @@ const readFile = promisify(fs.readFile);
 const exists = promisify(fs.exists);
 const rmrf = promisify(rimraf);
 
-const HTMLTemplate = (post, mountPoint) => (`
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <title>Representer</title>
-    <meta http-equiv="refresh" content="0;URL='/${mountPoint}/?post=${post.name}'" />
-  </head>
-</html>
-`);
-
-const withoutExtension = (str) => str.replace(/\..*/, '');
-
-const title = (text) => text.split('\n')[0].replace(/#\s/, '');
-
-const postsJSON = (names, texts) => names.map((name, index) => {
-  const text = texts[index];
-  return {
-    id: index, // React key
-    name,
-    text,
-    title: title(text),
-  };
-});
-
-const postWithoutText = (post) => (
-  {
-    id: post.id,
-    name: post.name,
-    title: post.title,
-  }
-);
+const id = shortid.generate;
+const I = (identity) => identity;
+const map = (fn) => (data) => data.map(fn);
+const filter = (fn) => (data) => data.filter(fn);
+const mapAsync = (fn) => (data) => Promise.all(data.map(fn));
 
 const errHandler = (err) => {
   // eslint-disable-next-line no-console
   console.log(err.stack);
   throw new Error(err);
 };
+
+
+const HTMLTemplate = (postName, mountPoint) => (`
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Representer</title>
+    <meta http-equiv="refresh" content="0;URL='/${mountPoint}/?post=${postName}'" />
+  </head>
+</html>
+`);
+
+const title = (text) => text.split('\n')[0].replace(/#\s/, '');
+const notASystemFile = (path) => path !== '.DS_Store';
+const imageFile = (fileName) => fileName.match(/.jpg|.jpeg|.png/) ? fileName : false;
+const mdFile = (fileName) => fileName.match(/.md/) ? fileName : false;
+
+const postsWithContent = (postFolder) => ({
+  // [ [ 'img.png', 'post-1' ], [ 'post-2' ] ]
+  images: postFolder.map(imageFile).filter(I),
+  name: postFolder.map(mdFile).filter(I)[0].replace(/\..*/, ''), // Remove extension.
+});
+
 
 class Converter {
   constructor(input, output, mountPoint = '', clean = false) {
@@ -69,76 +67,101 @@ class Converter {
   }
 
   convert() {
-    co(() => this.main()).catch(errHandler);
+    this.main().catch(errHandler);
   }
 
-  * main() {
-    const names = yield this.names(this.input);
-    const texts = yield this.texts(names);
-    const namesWithoutExtension = names.map(withoutExtension);
-    const posts = postsJSON(namesWithoutExtension, texts);
+  async main() {
+    if (this.clean) await this.eraseOutputDir();
+    await this.createOutputDirs();
 
-    if (this.clean) yield this.cleanOutputDir();
-    yield this.createOutputDirs();
-    yield this.writeDirs(namesWithoutExtension);
-    yield this.writePosts(posts);
-    yield this.writeIndexFile(posts);
+    await this.readdir(this.input)
+      .then(filter(notASystemFile))
+      .then(map((dir) => p.join(this.input, dir)))
+      .then(mapAsync(this.readdir))
+      .then(map(postsWithContent))
+      .then(mapAsync(this.postWithText.bind(this)))
+      .then(mapAsync(this.createPostDir.bind(this)))
+      .then(mapAsync(this.createImageDirs.bind(this)))
+      .then(map(this.copyImage.bind(this)))
+      .then(mapAsync(this.createPostFiles.bind(this)))
+      .then((posts) => this.createIndexFile(posts));
   }
 
-  * names(dir) {
-    return Promise.resolve(yield readdir(dir));
+  async readdir(dir) {
+    return await readdir(dir); // eslint-disable-line no-return-await
   }
 
-  * text(name) {
-    return Promise.resolve(yield readFile(p.join(this.input, name), 'utf8'));
+  copyImage(path) {
+    path.images.map((i) => fs.createReadStream(`${this.input}/${path.name}/${i}`)
+        .pipe(fs.createWriteStream(`${this.output}/posts/${path.name}/images/${i}`)));
+    return path;
   }
 
-  * texts(names) {
-    return Promise.resolve(yield names.map(this.text.bind(this)));
+  async postWithText(post) {
+    return {
+      ...post,
+      ...{ text: await readFile(`${this.input}/${post.name}/${post.name}.md`, 'utf8') },
+    };
   }
 
-  * writePost(post) {
-    Promise.resolve(yield appendFile(
+  async createPostFiles(post) {
+    await appendFile(
       p.join(this.output, 'posts', post.name, `${post.name}.json`),
-      JSON.stringify(post)),
-    );
+      JSON.stringify({
+        name: post.name,
+        text: post.text,
+        title: title(post.text),
+      }));
 
-    Promise.resolve(yield appendFile(
+    await appendFile(
       p.join(this.output, 'posts', post.name, 'index.html'),
-      HTMLTemplate(post, this.mountPoint)),
-    );
+      HTMLTemplate(post.name, this.mountPoint));
+
+    return post;
   }
 
-  * writePosts(files) {
-    if (!(yield exists(`${this.output}/posts/`))) yield this.writeDir('posts');
-    yield Promise.resolve(yield files.map(this.writePost.bind(this)));
-  }
-
-  * writeIndexFile(posts) {
-    yield Promise.resolve(yield appendFile(
+  async createIndexFile(posts) {
+    // TODO: [] and comma
+    // console.log('POSTS', posts);
+    await appendFile(
       `${this.output}/index.json`,
-      JSON.stringify(posts.map(postWithoutText))),
+      JSON.stringify(
+        posts.map((post) => (
+          {
+            id: id(),
+            name: post.name,
+            title: title(post.text),
+          }
+        )),
+      ),
     );
+    return posts;
   }
 
-  * writeDir(dir) {
+  async createDirInOutput(dir) {
+    // TODO: Recursive create.
     const path = p.join(this.output, dir || '');
-    return (yield exists(path)) ? false : Promise.resolve(yield mkdir(path));
+    if (!(await exists(path))) await mkdir(path);
+    return dir;
   }
 
-  * writeDirs(dirs) {
-    yield Promise.resolve(yield dirs
-      .map((dir) => p.join('posts', dir))
-      .map(this.writeDir.bind(this)));
+  async createImageDirs(post) {
+    await this.createDirInOutput(p.join('posts', post.name, 'images'));
+    return post;
   }
 
-  * cleanOutputDir() {
-    return Promise.resolve(rmrf(p.join(this.output, '*')));
+  async createPostDir(post) {
+    await this.createDirInOutput(p.join('posts', post.name));
+    return post;
   }
 
-  * createOutputDirs() {
-    Promise.resolve(yield this.writeDir());
-    Promise.resolve(yield this.writeDir('posts'));
+  async eraseOutputDir() {
+    await rmrf(p.join(this.output));
+  }
+
+  async createOutputDirs() {
+    await this.createDirInOutput();
+    await this.createDirInOutput('posts');
   }
 }
 
