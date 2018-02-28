@@ -1,4 +1,6 @@
 import React from 'react';
+import SyntaxHighLighter from 'react-syntax-highlighter';
+import { idea } from 'react-syntax-highlighter/styles/hljs';
 import shortid from 'shortid';
 
 const config = require('../../../config');
@@ -28,6 +30,7 @@ const image = (postName) => (m) => (
     key={id()}
   />
 );
+const code = (m) => <SyntaxHighLighter key={id()} language={m[1]} style={idea}>{m[2]}</SyntaxHighLighter>;
 
 const id = shortid.generate;
 const I = (identity) => identity;
@@ -65,6 +68,7 @@ const toNodeList = (postName) => (text) => (rendered) => {
     [h1, /#(.*)\n/],
     [newline, /\n/],
     [image(postName), /(?:!\[(.*?)\]\((.*?)\))/],
+    [code, /```(.*)((.|\n)*?)```/],
   ];
 
   const sortedJSXs = jsxs(text, matchers)
