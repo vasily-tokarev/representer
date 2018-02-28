@@ -2,6 +2,11 @@ import React from 'react';
 import SyntaxHighLighter from 'react-syntax-highlighter';
 import { idea } from 'react-syntax-highlighter/styles/hljs';
 import shortid from 'shortid';
+import styled from 'styled-components';
+
+const Img = styled.img`
+  max-width: 100%;
+`;
 
 const config = require('../../../config');
 
@@ -24,7 +29,7 @@ const italic = (m) => <i key={id()}>{m[1]}</i>;
 const h1 = (m) => <strong key={id()}>{m[1]}<br/></strong>;
 const newline = () => <br key={id()}/>;
 const image = (postName) => (m) => (
-  <img
+  <Img
     alt={m[1]}
     src={`${config.env === 'prod' ? `/${config.mountPoint}` : ''}/posts/${postName}/images/${m[2]}`}
     key={id()}
