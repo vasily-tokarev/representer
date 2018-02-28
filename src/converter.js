@@ -48,7 +48,7 @@ const HTMLTemplate = (postName, mountPoint) => (`
 
 const title = (text) => text.split('\n')[0].replace(/#\s/, '');
 const notASystemFile = (path) => path !== '.DS_Store';
-const imageFile = (fileName) => fileName.match(/.jpg|.jpeg|.png/) ? fileName : false;
+const imageFile = (fileName) => fileName.match(/.jpg|.jpeg|.png|.gif/) ? fileName : false;
 const mdFile = (fileName) => fileName.match(/.md/) ? fileName : false;
 
 const postsWithContent = (postFolder) => ({
@@ -121,8 +121,6 @@ class Converter {
   }
 
   async createIndexFile(posts) {
-    // TODO: [] and comma
-    // console.log('POSTS', posts);
     await appendFile(
       `${this.output}/index.json`,
       JSON.stringify(

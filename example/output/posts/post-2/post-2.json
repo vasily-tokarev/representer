@@ -1,0 +1,1 @@
+{"name":"post-2","text":"# Post Two\n\nCode hightlight:\n```javascript\nconst test = (hello) => world;\ntest();\nif (test) {\n  return false;\n}\n```\n\nImage:\n![keyboard](keyboard.jpg)\n\n\n","title":"Post Two"}

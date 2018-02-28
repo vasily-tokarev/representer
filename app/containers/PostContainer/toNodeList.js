@@ -1,17 +1,19 @@
 import React from 'react';
-import SyntaxHighLighter from 'react-syntax-highlighter';
-import { idea } from 'react-syntax-highlighter/styles/hljs';
+import SyntaxHighLighter from 'react-syntax-highlighter/prism';
 import shortid from 'shortid';
 import styled from 'styled-components';
+import rshStyle from './rsh-style';
 
 const Img = styled.img`
   max-width: 100%;
 `;
 
-const config = require('../../../config');
+const Span = styled.span`
+   font-family: monospace, monospace;
+   font-weight: 500;
+`;
 
-// TODO: Implement `re.exec` version.
-// https://stackoverflow.com/questions/6323417/how-do-i-retrieve-all-matches-for-a-regular-expression-in-javascript
+const config = require('../../../config');
 
 const element = (m, fn) => (
   {
@@ -23,11 +25,14 @@ const element = (m, fn) => (
   }
 );
 
-const url = (m) => <a key={id()} href={m[1]}>{m[2]}</a>;
+const backtick = (m) => <Span className="backtick" key={id()}>{m[1]}</Span>;
 const bold = (m) => <strong key={id()}>{m[1]}</strong>;
-const italic = (m) => <i key={id()}>{m[1]}</i>;
-const h1 = (m) => <strong key={id()}>{m[1]}<br/></strong>;
+const code = (m) => <SyntaxHighLighter key={id()} language={m[1]} style={rshStyle}>{m[2]}</SyntaxHighLighter>;
+const h1 = (m) => <h1 key={id()}>{m[2]}</h1>;
+const h2 = (m) => <h2 key={id()}>{m[1]}</h2>;
 const newline = () => <br key={id()}/>;
+const url = (m) => <a key={id()} href={m[1]}>{m[2]}</a>;
+const italic = (m) => <i key={id()}>{m[1]}</i>;
 const image = (postName) => (m) => (
   <Img
     alt={m[1]}
@@ -35,7 +40,6 @@ const image = (postName) => (m) => (
     key={id()}
   />
 );
-const code = (m) => <SyntaxHighLighter key={id()} language={m[1]} style={idea}>{m[2]}</SyntaxHighLighter>;
 
 const id = shortid.generate;
 const I = (identity) => identity;
@@ -63,17 +67,20 @@ const remainingText = (text, next) => {
   }
 };
 
-const toNodeList = (postName) => (text) => (rendered) => {
-  if (text.length === 0) return rendered;
+const toNodeList = (postName, text) => (rendered) => {
+  if (!text || text.length === 0) return rendered;
 
   const matchers = [
     [italic, /_(.*?)_/],
     [bold, /\*\*(.*?)\*\*/],
-    [url, /\[(.*)]\((.*)\)/],
-    [h1, /#(.*)\n/],
+    // [url, /\[(.*)]\((.*)\)/],
+    [url, /\[(.*?)]\((.*?)\)/],
+    [h1, /(^|\n)#\s(.*)/],
+    [h2, /##\s(.*)\n/],
     [newline, /\n/],
     [image(postName), /(?:!\[(.*?)\]\((.*?)\))/],
     [code, /```(.*)((.|\n)*?)```/],
+    [backtick, /`(.*?)`/],
   ];
 
   const sortedJSXs = jsxs(text, matchers)
@@ -84,7 +91,7 @@ const toNodeList = (postName) => (text) => (rendered) => {
   const sndJSX = sortedJSXs[1];
 
   const next = nextJSX(text, fstJSX) || nextText(text, fstJSX, sndJSX);
-  const convertWithRemaining = toNodeList(postName)(remainingText(text, next));
+  const convertWithRemaining = toNodeList(postName, remainingText(text, next));
 
   return next.type === 'jsx' ?
     convertWithRemaining(rendered.concat(nextJSX(text, next)))

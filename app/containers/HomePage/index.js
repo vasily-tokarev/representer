@@ -31,7 +31,7 @@ export class HomePage extends React.PureComponent { // eslint-disable-line react
     return (
       <div>
         {match ? <Redirect to={`/${config.mountPoint}/posts/${match[1]}`}/> : ''}
-        {posts && posts.length > 0 ? <PostsList posts={posts}/> : ''}
+        {posts ? <PostsList posts={posts}/> : ''}
       </div>
     );
   }

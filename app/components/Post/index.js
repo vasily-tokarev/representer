@@ -16,7 +16,6 @@ function Post(props) {
       <Helmet>
         <title>{props.title}</title>
       </Helmet>
-      {props.title}
       {props.text}
     </div>
   );

@@ -30,7 +30,7 @@ export class PostContainer extends React.PureComponent { // eslint-disable-line 
   }
 
   componentDidMount() {
-    if (!config.env === 'prod') {
+    if (config.env === 'dev') {
       new WebSocket('ws://localhost:8080').onmessage = (evt) => {
         this.props.onWSPayload(this.props.post.name, evt.data);
       };
@@ -46,7 +46,7 @@ export class PostContainer extends React.PureComponent { // eslint-disable-line 
       ? (<Post
         title={this.props.post.data.title}
         name={this.props.post.data.name}
-        text={toNodeList(this.props.post.data.name)(this.props.post.data.text)([]).map(html)}
+        text={toNodeList(this.props.post.data.name, this.props.post.data.text)([]).map(html)}
       />)
       : null;
   }

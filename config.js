@@ -5,20 +5,21 @@ module.exports = (function () { // eslint-disable-line func-names
         env: 'prod',
         mountPoint: 'representer',
         output: 'build/representer',
-        input: 'tmp/input',
+        input: 'example/input',
       };
     case 'test':
       return {
         env: 'test',
         mountPoint: 'representer',
         output: 'build/representer',
-        input: 'tmp/input',
+        input: 'example/input',
       };
     default:
       return {
+        env: 'dev',
         mountPoint: '/',
-        output: 'tmp/output',
-        input: 'tmp/input',
+        output: 'example/output',
+        input: 'example/input',
         clean: true,
       };
   }
