@@ -19,6 +19,7 @@ import path from 'path';
 import HomePage from 'containers/HomePage/Loadable';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import PostContainer from 'containers/PostContainer/Loadable';
+import Header from 'containers/Header';
 
 const config = require('../../../config');
 
@@ -33,13 +34,16 @@ const AppWrapper = styled.div`
 
 export default function App() {
   return (
-    <AppWrapper>
-      <Switch>
-        <Route exact path={path.join('/', config.mountPoint)} component={HomePage}/>
-        <Route path={path.join('/', config.mountPoint, 'posts', ':name')} component={PostContainer} />
-        <Route component={NotFoundPage}/>
-      </Switch>
-    </AppWrapper>
+    <div>
+      <Header/>
+      <AppWrapper>
+        <Switch>
+          <Route exact path={path.join('/', config.mountPoint)} component={HomePage}/>
+          <Route path={path.join('/', config.mountPoint, 'posts', ':name')} component={PostContainer}/>
+          <Route component={NotFoundPage}/>
+        </Switch>
+      </AppWrapper>
+    </div>
   );
 }
 
