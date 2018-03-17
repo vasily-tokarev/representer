@@ -24,7 +24,7 @@ import Header from 'containers/Header';
 const config = require('../../../config');
 
 const AppWrapper = styled.div`
-  max-width: calc(768px + 16px * 2);
+  max-width: 55em;
   margin: 0 auto;
   display: flex;
   min-height: 100%;
@@ -34,16 +34,14 @@ const AppWrapper = styled.div`
 
 export default function App() {
   return (
-    <div>
+    <AppWrapper>
       <Header/>
-      <AppWrapper>
-        <Switch>
-          <Route exact path={path.join('/', config.mountPoint)} component={HomePage}/>
-          <Route path={path.join('/', config.mountPoint, 'posts', ':name')} component={PostContainer}/>
-          <Route component={NotFoundPage}/>
-        </Switch>
-      </AppWrapper>
-    </div>
+      <Switch>
+        <Route exact path={path.join('/', config.mountPoint)} component={HomePage}/>
+        <Route path={path.join('/', config.mountPoint, 'posts', ':name')} component={PostContainer}/>
+        <Route component={NotFoundPage}/>
+      </Switch>
+    </AppWrapper>
   );
 }
 
