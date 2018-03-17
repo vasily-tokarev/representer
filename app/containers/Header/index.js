@@ -1,3 +1,5 @@
+// @flow
+
 /**
  *
  * Header
@@ -5,21 +7,32 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import styled from 'styled-components';
+import injectReducer from 'utils/injectReducer';
+import { createStructuredSelector } from 'reselect';
+
+import 'react-tippy/dist/tippy.css';
+import {
+  Tooltip,
+} from 'react-tippy';
+
+
+import reducer from './reducer';
 import HeaderLink from './HeaderLink';
+import { toggleHelp } from './actions';
+import { makeSelectHelpToggle } from './selectors';
+
 import {
   GithubIcon,
   UpworkIcon,
   HomeIcon,
-  SyntaxIcon,
+  // SyntaxIcon,
   QuestionIcon,
 } from './icons';
-// import TestIcon from './TestIcon';
 
-const Wrapper = styled.div`
+const FlexBox = styled.div`
   padding: 1em;
   display: flex;
   justify-content: space-between;
@@ -37,57 +50,123 @@ const Home = styled.div`
 const SyntaxQuestion = styled.div`
 `;
 
-const GithubLink = styled(HeaderLink)`
+const A = styled.a`
+  padding-right: 1em;
+  cursor: pointer;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  font-size: 1.5em;
+  color: #565656;
+
+  &:active {
+    color: black;
+  }
+`;
+
+const Help = styled(A)`
+  color: ${(props) => props.helpIsActive ? 'black' : '#565656'}
+`;
+
+const GithubLink = styled(A)`
   padding-right: 1em;
 `;
 
-const SyntaxLink = styled(HeaderLink)`
-   padding-right: 1em;
-`;
 
-function Header() {
-  return (
-    <Wrapper>
-      <GithubUpwork>
-        <GithubLink to="/">
-          <GithubIcon/>
-        </GithubLink>
-        <HeaderLink to="/">
-          <UpworkIcon/>
-        </HeaderLink>
-      </GithubUpwork>
+type Props = {|
+  helpIsActive: boolean,
+  helpHandler: Function,
+|}
 
-      <Home>
-        <HeaderLink to="/">
-          <HomeIcon/>
-        </HeaderLink>
-      </Home>
+export class Header extends React.PureComponent<Props> { // eslint-disable-line react/prefer-stateless-function
+  render() {
+    return (
+      <FlexBox>
+        <GithubUpwork>
+          <GithubLink target="_blank" href="https://github.com/vasily-tokarev">
+            <Tooltip
+              html={(
+                <span>Github <br/> profile</span>
+              )}
+              theme="light"
+              offset="-20"
+              arrow
+              sticky
+              open={this.props.helpIsActive}
+            >
+              <GithubIcon/>
+            </Tooltip>
+          </GithubLink>
+          <A target="_blank" href="https://www.upwork.com/freelancers/~0199b903db1c803191v">
+            <Tooltip
+              html={(
+                <span>Upwork <br/> profile</span>
+              )}
+              theme="light"
+              offset="20"
+              arrow
+              sticky
+              open={this.props.helpIsActive}
+            >
+              <UpworkIcon/>
+            </Tooltip>
+          </A>
+        </GithubUpwork>
 
-      <SyntaxQuestion to="/">
-        <SyntaxLink to="/">
-          <SyntaxIcon/>
-        </SyntaxLink>
-        <HeaderLink to="/">
-          <QuestionIcon/>
-        </HeaderLink>
-      </SyntaxQuestion>
-    </Wrapper>
-  );
+        <Home>
+          <HeaderLink to="/">
+            <Tooltip
+              open={this.props.helpIsActive}
+              title="Posts List"
+              theme="light"
+              arrow
+              sticky
+              distance="30"
+            >
+              <HomeIcon/>
+            </Tooltip>
+          </HeaderLink>
+        </Home>
+
+        <SyntaxQuestion to="/">
+          <Tooltip
+            open={this.props.helpIsActive}
+            title="Help"
+            theme="light"
+            arrow
+            sticky
+            distance="20"
+            offset="-20"
+          >
+            <Help
+              helpIsActive={this.props.helpIsActive}
+              onClick={() => this.props.helpHandler(this.props.helpIsActive)}
+            >
+              <QuestionIcon/>
+            </Help>
+          </Tooltip>
+        </SyntaxQuestion>
+      </FlexBox>
+    )
+      ;
+  }
 }
 
-Header.propTypes = {
-  dispatch: PropTypes.func.isRequired,
-};
+const mapStateToProps = createStructuredSelector({
+  helpIsActive: makeSelectHelpToggle(),
+});
 
-
-function mapDispatchToProps(dispatch) {
+export function mapDispatchToProps(dispatch: Function) {
   return {
-    dispatch,
+    helpHandler: (isActive: boolean) => {
+      dispatch(toggleHelp(isActive));
+    },
   };
 }
 
-const withConnect = connect(null, mapDispatchToProps);
+const withConnect = connect(mapStateToProps, mapDispatchToProps);
+const withReducer = injectReducer({ key: 'header', reducer });
 
 export default compose(
+  withReducer,
   withConnect,
 )(Header);
