@@ -3,9 +3,9 @@ module.exports = (function () { // eslint-disable-line func-names
     case 'production':
       return {
         env: 'prod',
-        mountPoint: 'representer',
-        output: 'build/representer',
-        input: 'example/input',
+        mountPoint: process.env.MOOUNT_POINT || 'representer',
+        output: process.env.OUTPUT_PATH || 'build/representer',
+        input: process.env.INPUT_PATH || 'example/input',
       };
     case 'test':
       return {

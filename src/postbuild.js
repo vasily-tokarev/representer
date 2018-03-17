@@ -8,9 +8,9 @@ const p = require('path');
 const shelljs = require('shelljs');
 const config = require('../config');
 
-const files = fs.readdirSync('./build')
+const files = fs.readdirSync(config.output)
   .filter((f) => f !== config.mountPoint)
-  .map((f) => p.join(process.cwd(), 'build', f));
+  .map((f) => p.join(config.output, f));
 
-shelljs.mv(files, p.join(process.cwd(), 'build', config.mountPoint));
+shelljs.mv(files, `${config.output}/${config.mountPoint}/`);
 

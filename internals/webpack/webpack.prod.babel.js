@@ -14,7 +14,7 @@ module.exports = require('./webpack.base.babel')({
   output: {
     filename: `./${config.mountPoint}/[name].[chunkhash].js`,
     chunkFilename: `./${config.mountPoint}/[name].[chunkhash].chunk.js`,
-    // publicPath: './representer',
+    path: config.output,
   },
 
   plugins: [
