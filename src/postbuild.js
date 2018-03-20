@@ -1,6 +1,5 @@
 /*
 Moves everything from the build folder to mount point folder.
-TODO: Find a way to do this using Webpack.
  */
 
 const fs = require('fs');
@@ -13,4 +12,3 @@ const files = fs.readdirSync(config.output)
   .map((f) => p.join(config.output, f));
 
 shelljs.mv(files, `${config.output}/${config.mountPoint}/`);
-
