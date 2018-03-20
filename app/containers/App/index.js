@@ -21,7 +21,7 @@ import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import PostContainer from 'containers/PostContainer/Loadable';
 import Header from 'containers/Header';
 
-const config = require('../../../config');
+const config = require('../../../config.json');
 
 const AppWrapper = styled.div`
   max-width: 55em;

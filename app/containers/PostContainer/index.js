@@ -20,7 +20,7 @@ import reducer from './reducer';
 import saga from './saga';
 import toNodeList from './toNodeList';
 
-const config = require('../../../config');
+const config = require('../../../config.json');
 
 const html = (el) => el.type === 'text' ? el.match : el.jsx(el.match);
 

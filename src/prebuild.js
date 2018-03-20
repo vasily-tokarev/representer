@@ -1,9 +1,11 @@
-module.exports = (function () { // eslint-disable-line func-names
+const fs = require('fs');
+
+const config = () => {
   switch (process.env.NODE_ENV) {
     case 'production':
       return {
         env: 'prod',
-        mountPoint: process.env.MOOUNT_POINT || 'representer',
+        mountPoint: process.env.MOUNT_POINT || 'me',
         output: process.env.OUTPUT_PATH || 'build/representer',
         input: process.env.INPUT_PATH || 'example/input',
       };
@@ -23,4 +25,6 @@ module.exports = (function () { // eslint-disable-line func-names
         clean: true,
       };
   }
-}());
+};
+
+fs.writeFileSync('config.json', JSON.stringify(config()));

@@ -13,7 +13,7 @@ const Span = styled.span`
    font-weight: 500;
 `;
 
-const config = require('../../../config');
+const config = require('../../../config.json');
 
 const element = (m, fn) => (
   {

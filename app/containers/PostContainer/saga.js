@@ -5,7 +5,7 @@ import { postLoaded } from './actions';
 import { LOAD_POST } from './constants';
 import { makeSelectPostName } from './selectors';
 
-const config = require('../../../config');
+const config = require('../../../config.json');
 
 export function* getPost() {
   const name = yield select(makeSelectPostName());

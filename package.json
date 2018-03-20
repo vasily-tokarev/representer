@@ -20,7 +20,7 @@
     "npmcheckversion": "node ./internals/scripts/npmcheckversion.js",
     "preinstall": "npm run npmcheckversion",
     "postinstall": "npm run build:dll",
-    "prebuild": "npm run build:clean",
+    "prebuild": "npm run build:clean; cross-env NODE_ENV=production node ./src/prebuild.js",
     "postbuild": "cross-env NODE_ENV=production node ./src/postbuild.js",
     "build": "cross-env NODE_ENV=production webpack --config internals/webpack/webpack.prod.babel.js --color -p --progress --hide-modules --display-optimization-bailout; npm run build:convert",
     "build:convert": "cross-env NODE_ENV=production node ./src/converter.js",

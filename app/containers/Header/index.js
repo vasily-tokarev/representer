@@ -18,12 +18,6 @@ import {
   Tooltip,
 } from 'react-tippy';
 
-
-import reducer from './reducer';
-import HeaderLink from './HeaderLink';
-import { toggleHelp } from './actions';
-import { makeSelectHelpToggle } from './selectors';
-
 import {
   GithubIcon,
   UpworkIcon,
@@ -31,6 +25,13 @@ import {
   // SyntaxIcon,
   QuestionIcon,
 } from './icons';
+
+
+import reducer from './reducer';
+import HeaderLink from './HeaderLink';
+import { toggleHelp } from './actions';
+import { makeSelectHelpToggle } from './selectors';
+const config = require('../../../config.json');
 
 const FlexBox = styled.div`
   padding: 1em;
@@ -96,7 +97,7 @@ export class Header extends React.PureComponent<Props> { // eslint-disable-line 
               <GithubIcon/>
             </Tooltip>
           </GithubLink>
-          <A target="_blank" href="https://www.upwork.com/freelancers/~0199b903db1c803191v">
+          <A target="_blank" href="https://www.upwork.com/o/profiles/users/_~0199b903db1c803191/">
             <Tooltip
               html={(
                 <span>Upwork <br/> profile</span>
@@ -113,7 +114,7 @@ export class Header extends React.PureComponent<Props> { // eslint-disable-line 
         </GithubUpwork>
 
         <Home>
-          <HeaderLink to="/">
+          <HeaderLink to={`/${config.mountPoint}`}>
             <Tooltip
               open={this.props.helpIsActive}
               title="Posts List"

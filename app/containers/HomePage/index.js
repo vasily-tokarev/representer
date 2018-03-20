@@ -18,7 +18,7 @@ import { loadPosts } from './actions';
 import makeSelectHomePage from './selectors';
 import reducer from './reducer';
 import saga from './saga';
-const config = require('../../../config');
+const config = require('../../../config.json');
 
 export class HomePage extends React.PureComponent { // eslint-disable-line react/prefer-stateless-function
   componentDidMount() {
