@@ -36,7 +36,6 @@ const errHandler = (err) => {
   throw new Error(err);
 };
 
-
 const HTMLTemplate = (postName, mountPoint) => (`
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -48,6 +47,14 @@ const HTMLTemplate = (postName, mountPoint) => (`
 
 const title = (text) => text.split('\n')[0].replace(/#\s/, '');
 const notASystemFile = (path) => path !== '.DS_Store';
+// Filters posts that aren't ready.
+const inProgress = (path) => {
+  let ok = true;
+  path.forEach((file) => {
+    if (file === 'in-progress') ok = false;
+  });
+  return ok;
+};
 const imageFile = (fileName) => fileName.match(/.jpg|.jpeg|.png|.gif/) ? fileName : false;
 const mdFile = (fileName) => fileName.match(/.md/) ? fileName : false;
 
@@ -78,6 +85,7 @@ class Converter {
       .then(filter(notASystemFile))
       .then(map((dir) => p.join(this.input, dir)))
       .then(mapAsync(this.readdir))
+      .then(filter(inProgress))
       .then(map(postsWithContent))
       .then(mapAsync(this.postWithText.bind(this)))
       .then(mapAsync(this.createPostDir.bind(this)))
@@ -93,7 +101,7 @@ class Converter {
 
   copyImage(path) {
     path.images.map((i) => fs.createReadStream(`${this.input}/${path.name}/${i}`)
-        .pipe(fs.createWriteStream(`${this.output}/posts/${path.name}/images/${i}`)));
+      .pipe(fs.createWriteStream(`${this.output}/posts/${path.name}/images/${i}`)));
     return path;
   }
 
