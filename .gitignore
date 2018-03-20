@@ -1,5 +1,7 @@
 /.envrc
 /.idea
+/.vscode
+/config.json
 /build
 /coverage
 /node_modules
